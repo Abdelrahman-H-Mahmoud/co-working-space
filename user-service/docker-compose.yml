@@ -6,20 +6,28 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: user
+    env_file: .env
+    environment:
+      - MONGO_DB_USER=$MONGO_DB_USER
+      - MONGO_DB_PASSWORD=$MONGO_DB_PASSWORD
+      - MONGO_DB_HOST=$MONGO_DB_HOST
+      - MONGO_DB_PORT=$MONGO_DB_PORT
+      - MONGO_DB_NAME=$MONGO_DB_NAME
+      - PORT=$PORT 
     restart: unless-stopped
     ports:
       - "3000:3000"
     volumes:
-      - .:/home/node/app
-      - node_modules:/home/node/app/node_modules
+      - .:/app
+      - node_modules:/app/node_modules
     networks:
       - app-network
     depends_on: 
-      - db
+      - mongo
 
-  db:
+  mongo:
     image: mongo:4.1.8-xenial
-    container_name: db
+    container_name: mongo
     restart: unless-stopped
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root

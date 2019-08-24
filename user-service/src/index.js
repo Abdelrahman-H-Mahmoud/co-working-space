@@ -1,7 +1,7 @@
 const app=require('express').Router();
+const bodyParser=require('body-parser');
 
-app.get('/', (req, res) => res.send('Hello Fucking World!'))
-
+app.use(bodyParser.json());
 
 
 module.exports=app;
