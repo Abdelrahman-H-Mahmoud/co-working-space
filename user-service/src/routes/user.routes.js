@@ -1,32 +1,18 @@
 const app = require('express').Router();
-const Joi = require('@hapi/joi');
 const UserService = require('../services/user.service');
+const schemas = require('./schema');
+const validateBody = require('./middlewares/validate');
 
-app.post('/', async (req, res) => {
-    let user = req.body.user;
-    const schema = Joi.object().keys(
-        {
-
-            name: Joi.string().required(),
-            mobile: Joi.string().required(),
-            email: Joi.string().required(),
-            password: Joi.string().required()
-
-        }
-    );
-
-    const result = schema.validate(user);
-    if (result.error) {
-        res.status(400).json({ message: "validation error" })
-
-    }
+app.post('/', validateBody(schemas.user_post_register), async (req, res) => {
 
     let userService = new UserService();
+    const {user}=req.body;
     try {
         await userService.addUser(user);
         res.status(200).json({ message: "user added successfully" });
     }
     catch (error) {
+        console.log(error);
         res.status(500).json({ message: "Internal Server Error" });
     }
 });
