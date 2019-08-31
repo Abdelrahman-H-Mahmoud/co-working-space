@@ -11,6 +11,14 @@ const schemas = {
             }
         }
     ),
+    user_post_login:Joi.object().keys(
+        {
+            user:{
+                email: Joi.string().required(),
+                password: Joi.string().required()
+            }
+        }
+    )
 };
 
 

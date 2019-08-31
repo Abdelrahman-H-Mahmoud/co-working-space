@@ -6,5 +6,8 @@ module.exports={
         user:process.env.MONGO_DB_USER,
         password:process.env.MONGO_DB_PASSWORD,
         db_name:process.env.MONGO_DB_NAME
-    }
+    },
+    secert: process.env.SECRET,
+    token_expiration: process.env.TOKEN_EXPIRATION
+
 }
