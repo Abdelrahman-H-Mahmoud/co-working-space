@@ -1,7 +1,7 @@
 const app = require('express').Router();
 const UserService = require('../services/user.service');
 const schemas = require('./schema');
-const validateBody = require('./middlewares/validate');
+const {validate:validateBody,authorize} = require('./middlewares');
 
 const userService=new UserService();
 app.post('/', validateBody(schemas.user_post_register), async (req, res) => {
@@ -35,5 +35,10 @@ app.post('/login',validateBody(schemas.user_post_login),async (req,res)=>{
     }
     
 });
+
+app.get('/',authorize,(req,res)=>{
+    console.log(req.user);
+    return res.send('done');
+})
 
 module.exports = app

@@ -28,9 +28,12 @@ class UserService {
             let data = await this.userRepo.find({ 'email': email });
             if (data && data.length) {
                 let user = data[0];
+                
                 let isIdentical = await password_management.compare(password, user.password);
-                if (isIdentical)
-                    return token_management.generateToken(_.omit(user, ['password']));
+                if (isIdentical){
+                    const data=_.pick(user.toObject(),["_id"]);
+                    return token_management.generateToken(data);
+                }
 
                 return false;
             }
