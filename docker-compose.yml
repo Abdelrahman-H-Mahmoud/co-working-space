@@ -1,0 +1,105 @@
+version: '3'
+
+services:
+  user:
+    container_name: user
+    environment:
+      - MONGO_DB_USER=root
+      - MONGO_DB_PASSWORD=password
+      - MONGO_DB_HOST=user_db
+      - MONGO_DB_PORT=27017
+      - MONGO_DB_NAME=user
+      - PORT=3000
+      - SECRET=WTF
+      - TOKEN_EXPIRATION=365h
+    build:
+      context: ./user-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      - user-service:/app
+    networks:
+      - app-network
+    depends_on: 
+      - user-db
+
+  user-db:
+    image: mongo:4.1.8-xenial
+    container_name: user_db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:     
+      - dbdata:/data/db
+    networks:
+      - app-network
+
+  coworking-space:
+    container_name: coworking_space
+    environment:
+      - MONGO_DB_USER=root
+      - MONGO_DB_PASSWORD=password
+      - MONGO_DB_HOST=coworking_space_db
+      - MONGO_DB_PORT=27017
+      - MONGO_DB_NAME=coworking_space
+      - PORT=3000
+      - SECRET=WTF
+      - TOKEN_EXPIRATION=365h
+    build:
+      context: ./co-working-space-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    volumes:
+      - co-working-space-service:/app
+    networks:
+      - app-network
+    depends_on: 
+      - coworking-space-db
+
+  coworking-space-db:
+    image: mongo:4.1.8-xenial
+    container_name: coworking_space_db
+    restart: unless-stopped
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=root
+      - MONGO_INITDB_ROOT_PASSWORD=password
+    volumes:     
+      - coworkingSpacedata:/data/db
+    networks:
+      - app-network
+      
+  mongo-express:
+    image: mongo-express
+    environment:
+      - ME_CONFIG_MONGODB_SERVER=user-db
+      - ME_CONFIG_MONGODB_PORT=27017
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_AUTH_USERNAME=root
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=root
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=password
+      - ME_CONFIG_MONGODB_AUTH_PASSWORD=password
+      - ME_CONFIG_BASICAUTH_USERNAME=dev
+      - ME_CONFIG_BASICAUTH_PASSWORD=dev
+    depends_on:
+      - user-db
+      - coworking-space-db
+    ports:
+      - "8888:8081"
+    networks:
+      - app-network    
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  dbdata:
+  coworkingSpacedata:
+  user-service:
+  co-working-space-service:
